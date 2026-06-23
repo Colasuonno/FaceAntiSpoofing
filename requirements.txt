@@ -1,0 +1,37 @@
+# Face Anti-Spoofing - dipendenze del progetto
+#
+# 1) Crea ed attiva una venv:
+#       python -m venv .venv
+#       source .venv/bin/activate           # Windows: .venv\Scripts\activate
+#
+# 2) Installa PyTorch PRIMA del resto (il wheel CUDA NON sta su PyPI).
+#    Scegli la riga giusta dal sito: https://pytorch.org/get-started/locally/
+#    Esempio per CUDA 13.0 (la build usata in questo progetto, torch 2.12.1+cu130):
+#       pip install torch==2.12.1 torchvision==0.27.1 --index-url https://download.pytorch.org/whl/cu130
+#    Solo CPU (demo su singola immagine, niente GPU):
+#       pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#
+# 3) Installa il resto:
+#       pip install -r requirements.txt
+
+# --- deep learning ---
+timm==1.0.27
+
+# --- baseline classico (color-texture LBP + SVM) ---
+scikit-learn==1.9.0
+scikit-image==0.26.0
+
+# --- elaborazione immagini / demo webcam ---
+opencv-python==4.13.0.92
+pillow==12.2.0
+
+# --- dati e utilita' ---
+numpy==2.4.6
+pandas==3.0.3
+joblib==1.5.3
+matplotlib==3.11.0
+
+# --- download dataset (CelebA-Spoof da Hugging Face) ---
+huggingface_hub==1.20.1
+pyarrow
+gdown
