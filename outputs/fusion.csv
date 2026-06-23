@@ -1,0 +1,9 @@
+Method,EER%,AUC,ACER%
+SVM (solo),7.69,0.9761,7.69
+CNN (solo),3.69,0.994,3.69
+Fusion sum,3.35,0.9912,3.35
+Fusion mean,3.35,0.9912,3.35
+Fusion product,3.5,0.9948,3.5
+Fusion max,5.36,0.9858,5.36
+Fusion min,3.69,0.9945,3.69
+Fusion weighted (w=0.10),5.14,0.987,5.14
