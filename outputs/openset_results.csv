@@ -1,0 +1,7 @@
+tipo,file,atteso,live,decisione,sim,corretto
+genuino,P1010514.jpg,andreea,True,IDENTIFICATO: andreea,0.7208389043807983,True
+genuino,IMG_8216.jpg,giovanni,True,IDENTIFICATO: giovanni,0.6227704882621765,True
+impostore,IMG-20250725-WA0008.jpg,SCONOSCIUTO,False,SPOOF (attacco bloccato),,True
+impostore,IMG20250907173822.jpg,SCONOSCIUTO,True,SCONOSCIUTO (non iscritto),0.10925419628620148,True
+impostore,IMG20251012110642.jpg,SCONOSCIUTO,False,SPOOF (attacco bloccato),,True
+impostore,IMG20260418141421.jpg,SCONOSCIUTO,False,SPOOF (attacco bloccato),,True

@@ -123,6 +123,33 @@ Riepilogo di quello che è stato fatto finora. Per il piano completo vedi `PIANO
   reali rileva il volto normalmente.
 - **Come lanciarla**: `python demo/webcam_demo.py` (prima, consigliata, la calibrazione coi propri dati).
 
+## ✅ Fase 11 — Riconoscimento + sistema biometrico completo
+- Aggiunto lo stadio mancante: da solo anti-spoofing a **sistema biometrico completo**
+  (anti-spoof → riconoscimento). Pipeline: `volto → anti-spoof (live/spoof) → se LIVE → identificazione (chi sei? / sconosciuto)`.
+- **Embedding**: `facenet-pytorch` → MTCNN (rileva+allinea) + InceptionResnetV1 (VGGFace2) → vettore 512-d; confronto con **cosine similarity**.
+- **Benchmark LFW** (il nostro dataset anti-spoof non ha le identità → si valuta il recognition su LFW):
+  | Compito | Risultato |
+  |---|---|
+  | Verification 1:1 | EER **3,30%**, AUC 0,974 |
+  | Identification 1:N | rank-1 **96,77%**, rank-5 97,80% |
+  | Soglia accettazione (cosine) | **0,392** (calibrata, non a occhio) |
+- **Test open-set sullo scenario utente**: iscritti `andreea`, `giovanni` (1 foto a testa), impostori = tue 4 foto + 50 LFW:
+  | Esito | Conteggio |
+  |---|---|
+  | Genuini identificati | **2/2** |
+  | Impostori tuoi rifiutati | **4/4** |
+  | Impostori LFW rifiutati | **50/50** |
+  | **Falsi accessi** | **0** |
+- **Open-set**: il sistema può rispondere "SCONOSCIUTO" (non costretto a scegliere un nome).
+- **Nota onesta**: 3/4 foto-impostore (es. WhatsApp molto compresse) segnalate SPOOF dall'anti-spoof
+  → falso allarme da compressione JPEG = ancora il **domain gap** della Fase 7 (non causa falsi accessi).
+- Fix: raddrizzamento EXIF delle foto da telefono (MTCNN non trovava il volto su una foto ruotata).
+- Prodotti: `src/recognition.py`, `src/recognition_eval.py`, `src/biometric_system.py`,
+  `src/openset_eval.py`, `demo/identify_image.py`, `demo/identify_webcam.py`,
+  `recognition_eval.csv`, `openset_results.csv`, `recog_threshold.npy`,
+  `roc_verification.png`, `cmc_identification.png`, `identify_*.png`.
+- **Come lanciare la demo**: `python demo/identify_webcam.py` (iscrive in automatico i soggetti di `data/gallery/`).
+
 ## File prodotti finora
 ```
 Project - Face Anti-Spoofing/
@@ -146,11 +173,17 @@ Project - Face Anti-Spoofing/
 │   ├── evaluate.py          # framework valutazione/confronto (Fase 6)
 │   ├── cross_dataset.py     # valutazione cross-dataset (Fase 7)
 │   ├── fusion.py            # fusione score-level (Fase 8)
-│   └── infer.py             # SpoofDetector per la demo (Fase 9)
+│   ├── infer.py             # SpoofDetector per la demo (Fase 9)
+│   ├── recognition.py       # FaceEmbedder: MTCNN + InceptionResnetV1 (Fase 11)
+│   ├── recognition_eval.py  # verification/identification su LFW (Fase 11)
+│   ├── biometric_system.py  # anti-spoof + recognition in cascata (Fase 11)
+│   └── openset_eval.py      # test open-set gallery utente (Fase 11)
 ├── demo/
 │   ├── single_image.py      # demo su singola immagine
 │   ├── webcam_demo.py       # demo webcam real-time
-│   └── calibrate.py         # cattura propri dati + fine-tuning
+│   ├── calibrate.py         # cattura propri dati + fine-tuning
+│   ├── identify_image.py    # sistema completo su immagine (Fase 11)
+│   └── identify_webcam.py   # sistema completo real-time (Fase 11)
 └── outputs/
     ├── crops_preview.png    # anteprima live vs spoof
     ├── aug_preview.png      # anteprima augmentation
@@ -174,9 +207,10 @@ Project - Face Anti-Spoofing/
 
 ---
 
-## Stato: Fasi 1→9 completate ✅
+## Stato: Fasi 1→9 + 11 completate ✅ (sistema biometrico completo: anti-spoof + recognition)
 
 ## ⏭️ Prossimi step
-- **Fase 10 — Report + slide** (ultima fase del piano).
+- **Fase 10 — Report + slide** (ultima fase del piano). Esiste già `report_personale.pdf`
+  (guida di studio, non la relazione ufficiale) che copre anche la Fase 11.
 - **(Bonus, opzionale) — Ridurre il gap cross-dataset**: piu' augmentation / training su mix
   di dati e rimisurare l'HTER cross.

@@ -85,10 +85,42 @@ def plot_roc(curves: dict, path: str, title: str = "ROC"):
         fpr, tpr, _ = roc_curve(labels, scores)
         plt.plot(fpr, tpr, label=f"{name} (AUC={auc(fpr,tpr):.3f})")
     plt.plot([0, 1], [0, 1], "k--", lw=0.7)
-    plt.xlabel("FPR (spoof accettati come live)")
-    plt.ylabel("TPR (spoof rilevati)")
+    plt.xlabel("FPR (genuine rejected as spoof)")
+    plt.ylabel("TPR (spoof detected)")
     plt.title(title); plt.legend(loc="lower right"); plt.grid(alpha=0.3)
     plt.tight_layout(); plt.savefig(path, dpi=130); plt.close()
+
+
+def plot_far_frr(scores, labels, path: str, title: str = "FAR/FRR vs soglia",
+                 n: int = 400, logx: bool = False):
+    """Curve FAR e FRR al variare della soglia, con il punto di incrocio (EER).
+    logx=True: asse x logaritmico (utile quando gli score si ammassano vicino a 0/1,
+    es. softmax di una CNN molto sicura -> l'incrocio EER sarebbe schiacciato a sinistra)."""
+    scores = np.asarray(scores, dtype=float); labels = np.asarray(labels, dtype=int)
+    if logx:
+        ts = np.logspace(-4, 0, n)  # da 1e-4 a 1 (score softmax in [0,1])
+    else:
+        ts = np.linspace(scores.min(), scores.max(), n)
+    fars, frrs = [], []
+    for t in ts:
+        far, frr = far_frr_at(scores, labels, t)
+        fars.append(far); frrs.append(frr)
+    fars, frrs = np.array(fars), np.array(frrs)
+    idx = np.nanargmin(np.abs(fars - frrs))
+    eer = float((fars[idx] + frrs[idx]) / 2); thr = float(ts[idx])
+    plt.figure(figsize=(6, 5))
+    plt.plot(ts, fars * 100, label="FAR (attacks accepted)", color="#c0392b")
+    plt.plot(ts, frrs * 100, label="FRR (genuine rejected)", color="#2c6fbb")
+    plt.axvline(thr, color="gray", ls="--", lw=0.8)
+    plt.plot(thr, eer * 100, "ko", ms=6)
+    plt.annotate(f"EER = {eer*100:.2f}%\n(thr = {thr:.3f})", (thr, eer * 100),
+                 textcoords="offset points", xytext=(12, 8), fontsize=9)
+    if logx:
+        plt.xscale("log")
+    plt.xlabel("threshold (spoofness score)"); plt.ylabel("error rate (%)")
+    plt.title(title); plt.legend(); plt.grid(alpha=0.3)
+    plt.tight_layout(); plt.savefig(path, dpi=130); plt.close()
+    return eer, thr
 
 
 def plot_det(curves: dict, path: str, title: str = "DET"):

@@ -17,6 +17,11 @@
 # --- deep learning ---
 timm==1.0.27
 
+# --- face recognition (Fase 11: MTCNN + InceptionResnetV1/VGGFace2) ---
+# nota: installato con --no-deps per non toccare la versione di torch+cu130
+#   pip install --no-deps facenet-pytorch
+facenet-pytorch==2.6.0
+
 # --- baseline classico (color-texture LBP + SVM) ---
 scikit-learn==1.9.0
 scikit-image==0.26.0
